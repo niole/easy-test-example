@@ -1,11 +1,9 @@
 import * as React from 'react';
 import './App.css';
-import {
-  Text,
-  Card,
-  Heading,
-} from 'rebass';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
+import { Card, CardText, CardHeader } from 'material-ui/Card';
 import { Politician } from './types';
+import Loader from './Loader';
 import PoliticianSelector from './PoliticianSelector';
 
 type StateProps = {
@@ -15,7 +13,7 @@ type StateProps = {
 };
 
 type HandlerProps = {
-  onSelectPolitician: (event: any) => void;
+  onSelectPolitician: (value?: any) => void;
 };
 
 type Props = StateProps & HandlerProps;
@@ -34,16 +32,21 @@ const getPoliticianTweets = (politician: Politician, resolve: (tweets: string[])
  * View is now a stateless react element, whose different states are much easier to test than before.
  */
 type TweetView = React.SFC<Props>;
-const View: TweetView = ({ onSelectPolitician, loading, tweets, selectedPolitician }) => (
-  <Card>
-    <Heading>
-      Tweets for {' '}
-      <PoliticianSelector onSelectPolitician={onSelectPolitician} selectedPolitician={selectedPolitician} />
-    </Heading>
+export const View: TweetView = ({ onSelectPolitician, loading, tweets, selectedPolitician }) => (
+  <MuiThemeProvider>
     <Card>
-      {loading ? <div className="loader" /> : tweets.map((tweet: string) => <Text key={tweet}>{tweet}</Text>)}
+      <CardHeader title={<span>Tweets for...
+          <PoliticianSelector
+            onSelectPolitician={onSelectPolitician}
+            selectedPolitician={selectedPolitician}
+          />
+        </span>}
+      />
+      <CardText>
+        {loading ? <Loader /> : tweets.map((tweet: string) => <div key={tweet}>{tweet}</div>)}
+      </CardText>
     </Card>
-  </Card>
+  </MuiThemeProvider>
 );
 
 const withApiHandlers = (Component: TweetView) => class extends React.Component<{}, StateProps> {
@@ -57,8 +60,8 @@ const withApiHandlers = (Component: TweetView) => class extends React.Component<
    * withApiHandlers contains the state that was once in View and now drives all asynchronous
    * interactions.
    */
-  selectPolitician = (event: any) => {
-    const selectedPolitician: Politician = event.target.value;
+  selectPolitician = (value?: any) => {
+    const selectedPolitician: Politician | undefined = value;
 
     if (selectedPolitician) {
       this.setState({ loading: true, selectedPolitician });
