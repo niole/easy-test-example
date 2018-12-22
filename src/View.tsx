@@ -5,8 +5,8 @@ import {
   Card,
   Heading,
 } from 'rebass';
-
-type Politician = 'trump' | 'obama' | '';
+import { Politician } from './types';
+import PoliticianSelector from './PoliticianSelector';
 
 type State = {
   selectedPolitician?: Politician;
@@ -18,8 +18,6 @@ const TWEET_MAP: { [key: string]: string[] } = {
   trump: ['Mexico', 'China', 'Kittens'],
   obama: ['Change', 'Dreamers', 'Obamacare'],
 };
-
-const POLITICIANS: Politician[] = ['trump', 'obama'];
 
 const getPoliticianTweets = (politician: Politician, resolve: (tweets: string[]) => void) =>
   setTimeout(() => {
@@ -67,10 +65,7 @@ class View extends React.Component<{}, State> {
       <Card>
         <Heading>
           Tweets for {' '}
-          <select onChange={this.selectPolitician} value={selectedPolitician} defaultValue={selectedPolitician}>
-            <option value="">Select a politician</option>
-            {POLITICIANS.map((name: Politician) => <option value={name} key={name}>{name}</option>)}
-          </select>
+          <PoliticianSelector onSelectPolitician={this.selectPolitician} selectedPolitician={selectedPolitician} />
         </Heading>
         <Card>
           {loading ? <div className="loader" /> : tweets.map((tweet: string) => <Text key={tweet}>{tweet}</Text>)}
