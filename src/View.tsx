@@ -8,11 +8,17 @@ import {
 import { Politician } from './types';
 import PoliticianSelector from './PoliticianSelector';
 
-type State = {
+type StateProps = {
   selectedPolitician?: Politician;
   tweets: string[];
   loading: boolean;
 };
+
+type HandlerProps = {
+  onSelectPolitician: (event: any) => void;
+};
+
+type Props = StateProps & HandlerProps;
 
 const TWEET_MAP: { [key: string]: string[] } = {
   trump: ['Mexico', 'China', 'Kittens'],
@@ -25,12 +31,22 @@ const getPoliticianTweets = (politician: Politician, resolve: (tweets: string[])
   }, 1000);
 
 /**
- * This view contains a dropdown, which lets users select
- * a politician whose tweets they want to read
- * The tweets show up in the main part of the view
- * and the dropdown lives in a toolbar at the top of the view.
+ * View is now a stateless react element, whose different states are much easier to test than before.
  */
-class View extends React.Component<{}, State> {
+type TweetView = React.SFC<Props>;
+const View: TweetView = ({ onSelectPolitician, loading, tweets, selectedPolitician }) => (
+  <Card>
+    <Heading>
+      Tweets for {' '}
+      <PoliticianSelector onSelectPolitician={onSelectPolitician} selectedPolitician={selectedPolitician} />
+    </Heading>
+    <Card>
+      {loading ? <div className="loader" /> : tweets.map((tweet: string) => <Text key={tweet}>{tweet}</Text>)}
+    </Card>
+  </Card>
+);
+
+const withApiHandlers = (Component: TweetView) => class extends React.Component<{}, StateProps> {
   state = {
     selectedPolitician: undefined,
     tweets: [],
@@ -38,13 +54,8 @@ class View extends React.Component<{}, State> {
   };
 
   /**
-   * Both the visualized tweets and the loading state are a product
-   * of the asynchronous `getPoliticianTweets` operation which is triggered by
-   * `selectPolitician`
-   *
-   * Our refactoring goal is to separate `View` into pieces such that
-   * this asynchronous operation will be represented in "spirit" but not in
-   * our tests in practice.
+   * withApiHandlers contains the state that was once in View and now drives all asynchronous
+   * interactions.
    */
   selectPolitician = (event: any) => {
     const selectedPolitician: Politician = event.target.value;
@@ -62,17 +73,14 @@ class View extends React.Component<{}, State> {
   render() {
     const { loading, tweets, selectedPolitician } = this.state;
     return (
-      <Card>
-        <Heading>
-          Tweets for {' '}
-          <PoliticianSelector onSelectPolitician={this.selectPolitician} selectedPolitician={selectedPolitician} />
-        </Heading>
-        <Card>
-          {loading ? <div className="loader" /> : tweets.map((tweet: string) => <Text key={tweet}>{tweet}</Text>)}
-        </Card>
-      </Card>
+      <Component
+        loading={loading}
+        tweets={tweets}
+        selectedPolitician={selectedPolitician}
+        onSelectPolitician={this.selectPolitician}
+      />
     );
   }
-}
+};
 
-export default View;
+export default withApiHandlers(View);
