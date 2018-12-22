@@ -39,6 +39,15 @@ class View extends React.Component<{}, State> {
     loading: false,
   };
 
+  /**
+   * Both the visualized tweets and the loading state are a product
+   * of the asynchronous `getPoliticianTweets` operation which is triggered by
+   * `selectPolitician`
+   *
+   * Our refactoring goal is to separate `View` into pieces such that
+   * this asynchronous operation will be represented in "spirit" but not in
+   * our tests in practice.
+   */
   selectPolitician = (event: any) => {
     const selectedPolitician: Politician = event.target.value;
 
