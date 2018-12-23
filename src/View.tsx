@@ -47,14 +47,10 @@ class View extends React.Component<{}, State> {
   selectPolitician = (value: Politician) => {
     const selectedPolitician: Politician = value;
 
-    if (selectedPolitician) {
-      this.setState({ loading: true, selectedPolitician });
-      getPoliticianTweets(selectedPolitician, (tweets: string[]) => {
-        this.setState({ loading: false, tweets });
-      });
-    } else {
-      this.setState({ selectedPolitician: undefined, tweets: [] });
-    }
+    this.setState({ loading: true, selectedPolitician });
+    getPoliticianTweets(selectedPolitician, (tweets: string[]) => {
+      this.setState({ loading: false, tweets });
+    });
   }
 
   render() {
