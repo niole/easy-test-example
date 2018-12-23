@@ -60,17 +60,13 @@ const withApiHandlers = (Component: TweetView) => class extends React.Component<
    * withApiHandlers contains the state that was once in View and now drives all asynchronous
    * interactions.
    */
-  selectPolitician = (value?: any) => {
-    const selectedPolitician: Politician | undefined = value;
+  selectPolitician = (value: Politician) => {
+    const selectedPolitician: Politician = value;
 
-    if (selectedPolitician) {
-      this.setState({ loading: true, selectedPolitician });
-      getPoliticianTweets(selectedPolitician, (tweets: string[]) => {
-        this.setState({ loading: false, tweets });
-      });
-    } else {
-      this.setState({ selectedPolitician: undefined, tweets: [] });
-    }
+    this.setState({ loading: true, selectedPolitician });
+    getPoliticianTweets(selectedPolitician, (tweets: string[]) => {
+      this.setState({ loading: false, tweets });
+    });
   }
 
   render() {
