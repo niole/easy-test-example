@@ -1,11 +1,9 @@
 import * as React from 'react';
 import './App.css';
-import {
-  Text,
-  Card,
-  Heading,
-} from 'rebass';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import { Card, CardText, CardHeader } from 'material-ui/Card';
 import { Politician } from './types';
+import Loader from './Loader';
 import PoliticianSelector from './PoliticianSelector';
 
 type State = {
@@ -46,8 +44,8 @@ class View extends React.Component<{}, State> {
    * this asynchronous operation will be represented in "spirit" but not in
    * our tests in practice.
    */
-  selectPolitician = (event: any) => {
-    const selectedPolitician: Politician = event.target.value;
+  selectPolitician = (value: Politician) => {
+    const selectedPolitician: Politician = value;
 
     if (selectedPolitician) {
       this.setState({ loading: true, selectedPolitician });
@@ -62,15 +60,20 @@ class View extends React.Component<{}, State> {
   render() {
     const { loading, tweets, selectedPolitician } = this.state;
     return (
-      <Card>
-        <Heading>
-          Tweets for {' '}
-          <PoliticianSelector onSelectPolitician={this.selectPolitician} selectedPolitician={selectedPolitician} />
-        </Heading>
+      <MuiThemeProvider>
         <Card>
-          {loading ? <div className="loader" /> : tweets.map((tweet: string) => <Text key={tweet}>{tweet}</Text>)}
+          <CardHeader title={<span>Tweets for...
+              <PoliticianSelector
+                onSelectPolitician={this.selectPolitician}
+                selectedPolitician={selectedPolitician}
+              />
+            </span>}
+          />
+          <CardText>
+            {loading ? <Loader /> : tweets.map((tweet: string) => <div key={tweet}>{tweet}</div>)}
+          </CardText>
         </Card>
-      </Card>
+      </MuiThemeProvider>
     );
   }
 }
